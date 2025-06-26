@@ -51,8 +51,8 @@ class CalcController {
     update(req, res) {
         const data = [];
 
-        base('Questions').select({
-            view: "Grid"
+        base('Датасет ПК').select({
+            view: "TGBOT"
         }).eachPage(function page(records, fetchNextPage) {
             records.forEach((record) => {
                 data.push(record);
