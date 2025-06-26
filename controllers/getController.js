@@ -49,9 +49,16 @@ class CalcController {
     //     "message": "Hello!!!"
     // }
     update(req, res) {
+        const data = [];
+
         base('Questions').select({
             view: "Grid"
         }).eachPage(function page(records, fetchNextPage) {
+            records.forEach((record) => {
+                data.push(record);
+            })
+            fetchNextPage()
+        }, function done(error) {
             db.query(`
                 CREATE TABLE IF NOT EXISTS questions (
                     id INTEGER PRIMARY KEY,
@@ -63,18 +70,18 @@ class CalcController {
                     isterminal TEXT
                 );
             `)
-                .then(function (data) {
+                .then(function (elem) {
                     const values = [];
-                    const placeholders = records.map((record, index) => {
+                    const placeholders = data.map((e, index) => {
                         const i = index * 7;
                         values.push(
-                            record.fields.ID,
-                            record.fields.ParentID,
-                            parseInt(record.fields.Level),
-                            record.fields.Sorting,
-                            record.fields.Question,
-                            record.fields.Answer,
-                            record.fields.IsTerminal
+                            e.fields.ID,
+                            e.fields.ParentID,
+                            parseInt(e.fields.Level),
+                            e.fields.Sorting,
+                            e.fields.Question,
+                            e.fields.Answer,
+                            e.fields.IsTerminal
                         );
                         return `($${i + 1}, $${i + 2}, $${i + 3}, $${i + 4}, $${i + 5}, $${i + 6}, $${i + 7})`
                     }).join(', ');
@@ -101,7 +108,6 @@ class CalcController {
                 .catch(function(error) {
                     errorMessage(req, res, error)
                 })
-        }, function done(error) {
             if (error) {
                 errorMessage(req, res, error);
             };
